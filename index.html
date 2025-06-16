@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ant AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --card-bg: #ffffff;
+      --text-color: #000000;
+      --primary-color: #007bff;
+      --primary-dark: #0056b3;
+      --strong-color: #004085;
+      --response-bg: #e9f2ff;
+      --response-border: #cce5ff;
+      --input-bg: #ffffff;
+      --selector-bg: #ffffff;
+      --selector-color: #000000;
+    }
+
+    body.ant-red {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #f8f9fa;
+      --primary-color: #dc3545;
+      --primary-dark: #a71d2a;
+      --strong-color: #f5c6cb;
+      --response-bg: #1a1a1a;
+      --response-border: #dc3545;
+      --input-bg: #2a2a2a;
+      --selector-bg: #2a2a2a;
+      --selector-color: #f8f9fa;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 40px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 850px;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    #userInput {
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid #ccc;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .inline-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 8px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .inline-button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .theme-select {
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      background-color: var(--selector-bg);
+      color: var(--selector-color);
+      border: 1px solid #ccc;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    #response {
+      background: var(--response-bg);
+      border: 1px solid var(--response-border);
+      border-radius: 8px;
+      margin-top: 25px;
+      padding: 20px;
+      min-height: 280px;
+      font-size: 0.95rem;
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    #response h3 {
+      color: var(--primary-dark);
+      font-size: 1.2em;
+    }
+
+    #response strong {
+      color: var(--strong-color);
+    }
+
+    #transcriptStatus {
+      font-size: 0.85rem;
+      margin-top: 5px;
+    }
+
+    .instruction-box {
+      background-color: var(--response-bg);
+      color: var(--text-color);
+      border: 1px solid var(--response-border);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    body:not(.ant-red) .instruction-box {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .confirm-close {
+      background-color: var(--card-bg);
+      border: 1px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .confirm-close .button-row {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    @media (max-width: 576px) {
+      .button-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .confirm-close .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+        <h2>Ant AI</h2>
+
+    <div id="howToUse" class="instruction-box">
+      <strong>🧠 How to use Ant AI:</strong>
+      <ul style="margin-top: 10px; padding-left: 20px;">
+        <li>Type your question and click <strong>Ask Ant AI</strong>.</li>
+        <li>You can also press <kbd>Ctrl + K</kbd> and then say your question out loud.</li>
+        <li>To make Ant AI read out the response, press <kbd>Ctrl + L</kbd>.</li>
+        <li>You have to press <kbd>Ctrl + Q</kbd> to copy Ant AI's text.</li>
+        <li>Use the dropdown menu to switch between themes.</li>
+      </ul>
+      <button onclick="showCloseConfirm()" style="position: absolute; top: 8px; right: 10px; background: transparent; border: none; font-weight: bold; color: var(--primary-color); font-size: 1.2rem; cursor: pointer;" title="Close instructions">❌</button>
+
+      <div id="confirmCloseBox" class="confirm-close">
+        <p>Are you sure you want to close the instructions?</p>
+        <div class="button-row">
+          <button class="inline-button" onclick="confirmCloseInstructions()">Yes</button>
+          <button class="inline-button" onclick="cancelCloseInstructions()">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="text" class="form-control mb-2" id="userInput" placeholder="Ask something..." />
+      <div id="transcriptStatus" class="text-muted"></div>
+    </div>
+
+    <div class="button-row">
+      <button class="inline-button" onclick="sendMessage()">🤖 Ask Ant AI</button>
+      <button class="inline-button" onclick="startListening()" title="Voice Input">🎙️ (Ctrl + K)</button>
+      <button class="inline-button" onclick="speakResponse()" title="Speak Response">🔊 (Ctrl + L)</button>
+      <button class="inline-button" onclick="copyResponse()" title="Copy Text">📋 (Ctrl + Q)</button>
+      <select id="themeSelector" class="theme-select" onchange="switchTheme()">
+        <option value="bird-blue">🐦 Bird Blue (Light)</option>
+        <option value="ant-red">🐜 Ant Red (Dark)</option>
+      </select>
+    </div>
+
+    <div id="response">
+      <div id="responseContent"></div>
+    </div>
+  </div>
+
+  <script>
+    let lastSpokenText = '';
+    let recognition;
+
+    function switchTheme() {
+      const theme = document.getElementById('themeSelector').value;
+      document.body.classList.toggle('ant-red', theme === 'ant-red');
+
+      const selector = document.getElementById('themeSelector');
+      if (theme === 'ant-red') {
+        selector.style.backgroundColor = '#2a2a2a';
+        selector.style.color = '#f8f9fa';
+      } else {
+        selector.style.backgroundColor = '#ffffff';
+        selector.style.color = '#000000';
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput').value;
+      const responseDiv = document.getElementById('responseContent');
+      if (!input) {
+        responseDiv.innerHTML = 'Please enter a Message to Ant AI.';
+        return;
+      }
+      responseDiv.innerHTML = 'Loading...';
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer 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',
+            'HTTP-Referer': 'https://www.sitename.com',
+            'X-Title': 'SiteName',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'deepseek/deepseek-r1:free',
+            messages: [{ role: 'user', content: input }],
+          }),
+        });
+        const data = await response.json();
+        const markdownText = data.choices?.[0]?.message?.content || 'No response received.';
+        const html = marked.parse(markdownText);
+        responseDiv.innerHTML = html;
+        lastSpokenText = markdownText;
+      } catch (error) {
+        responseDiv.innerHTML = 'Error: ' + error.message;
+      }
+    }
+
+    function speakResponse() {
+      if (!lastSpokenText) return;
+      const utterance = new SpeechSynthesisUtterance(lastSpokenText);
+      utterance.rate = 1;
+      speechSynthesis.speak(utterance);
+    }
+
+    function startListening() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Sorry, your browser doesn't support speech recognition.");
+        return;
+      }
+
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        document.getElementById('transcriptStatus').innerText = '🎤 Listening...';
+      };
+
+      recognition.onerror = () => {
+        document.getElementById('transcriptStatus').innerText = '⚠️ Error occurred.';
+      };
+
+      recognition.onend = () => {
+        document.getElementById('transcriptStatus').innerText = '';
+      };
+
+      recognition.onresult = event => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userInput').value = transcript;
+        document.getElementById('transcriptStatus').innerText = '✅ Heard: "' + transcript + '"';
+        sendMessage();
+      };
+
+      recognition.start();
+    }
+
+    function copyResponse() {
+      const responseText = document.getElementById('responseContent').innerText;
+      navigator.clipboard.writeText(responseText).catch(err => {
+        console.error('Failed to copy text.');
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        startListening();
+      } else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        speakResponse();
+      } else if (e.ctrlKey && e.key.toLowerCase() === 'q') {
+        e.preventDefault();
+        copyResponse();
+      }
+    });
+
+    function showCloseConfirm() {
+      document.getElementById("confirmCloseBox").style.display = "block";
+    }
+
+    function cancelCloseInstructions() {
+      document.getElementById("confirmCloseBox").style.display = "none";
+    }
+
+    function confirmCloseInstructions() {
+      document.getElementById("howToUse").style.display = "none";
+    }
+
+    switchTheme();
+  </script>
+</body>
+</html>
